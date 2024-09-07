@@ -1,0 +1,19 @@
+' Gambas class file
+
+Public Sub FORM_OPEN()
+
+  Dim jsonString As String
+  Dim jsonDecoded As Variant
+
+  ' Example JSON string
+  jsonString = "{\"name\":\"John\", \"age\":30, \"city\":\"New York\"}"
+
+  ' Decode the JSON string into a Variant
+  jsonDecoded = Json.Decode(jsonString)
+
+  ' Access values from the decoded JSON, which is a Collection
+  Print "Name: " & jsonDecoded["name"]
+  Print "Age: " & jsonDecoded["age"]
+  Print "City: " & jsonDecoded["city"]
+
+End
