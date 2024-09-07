@@ -1,0 +1,29 @@
+
+
+
+{
+  "shapes": [
+    {
+      "type": "line",
+      "startX": 10,
+      "startY": 20,
+      "endX": 150,
+      "endY": 200
+    },
+    {
+      "type": "rect",
+      "x": 50,
+      "y": 50,
+      "width": 100,
+      "height": 50,
+      "fillColor": "#FF0000"  // Red fill color in hex
+    },
+    {
+      "type": "circle",
+      "centerX": 200,
+      "centerY": 200,
+      "radius": 50,
+      "fillColor": "#00FF00"  // Green fill color in hex
+    }
+  ]
+}
