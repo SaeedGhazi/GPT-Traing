@@ -1,0 +1,389 @@
+Left$, Mid$, Right$ Functions
+Left$, Right$, and Mid$ are string manipulation functions in Gambas.
+Left$ extracts characters from the left side of the string.
+Left$("Gambas") returns "G".
+Right$ extracts characters from the right side of the string.
+Right$("Gambas") returns "s".
+Both functions can take an optional second parameter, which can be negative.
+Left$("Gambas", -2) returns "Gamb".
+Right$("Gambas", -2) returns "mbas".
+Mid$ extracts a substring from a string. The third parameter can be negative to avoid characters from the end.
+Mid$("Gambas", 2, -2) returns "amb".
+Last Keyword
+Last returns the last control that received an event, which is useful for writing generic event handlers.
+Example: In a calculator app with multiple buttons for digits, all sharing the same event handler, you can use Last.Tag to identify which button was pressed.
+gambas
+Copy code
+Public Sub Digit_Click()
+  Display = Display & Last.Tag
+  RefreshDisplay
+End Sub
+Tag Property
+The Tag property holds any Variant data relevant to the control.
+Useful for distinguishing controls in a group that share the same event handler.
+Embedding Forms
+Gambas allows embedding one form into another by passing a parent container to the constructor.
+gambas
+Copy code
+Dim hForm As MyDialog
+Dim hSuperControl As MyForm
+hForm = New MyDialog
+hSuperControl = New MyForm(Param1, Param2, MyDialog)
+hSuperControl.Move(8, 8, 128, 64)
+Forms in Gambas
+A form in Gambas is an event observer, directly managing its own events such as Resize, Activate, etc.
+This behavior is similar to Visual Basic forms.
+Control Groups
+The Group property allows controls to share the same event handler while distinguishing the source.
+gambas
+Copy code
+Public Sub MyGroup_Click()
+  ' Handles event for the whole control group
+End Sub
+I will extract and format the tips shown in the images for use in GPT training. Here’s the usable format based on the extracted text:
+
+---
+
+### Left$, Mid$, Right$ Functions
+- **Left$**, **Right$**, and **Mid$** are string manipulation functions in Gambas.
+- **Left$** extracts characters from the left side of the string.
+  - `Left$("Gambas")` returns `"G"`.
+- **Right$** extracts characters from the right side of the string.
+  - `Right$("Gambas")` returns `"s"`.
+- Both functions can take an optional second parameter, which can be negative.
+  - `Left$("Gambas", -2)` returns `"Gamb"`.
+  - `Right$("Gambas", -2)` returns `"mbas"`.
+- **Mid$** extracts a substring from a string. The third parameter can be negative to avoid characters from the end.
+  - `Mid$("Gambas", 2, -2)` returns `"amb"`.
+
+---
+
+### Last Keyword
+- **Last** returns the last control that received an event, which is useful for writing generic event handlers.
+- Example: In a calculator app with multiple buttons for digits, all sharing the same event handler, you can use `Last.Tag` to identify which button was pressed.
+  ```gambas
+  Public Sub Digit_Click()
+    Display = Display & Last.Tag
+    RefreshDisplay
+  End Sub
+  ```
+
+---
+
+### Tag Property
+- The **Tag** property holds any **Variant** data relevant to the control.
+- Useful for distinguishing controls in a group that share the same event handler.
+
+---
+
+### Embedding Forms
+- Gambas allows embedding one form into another by passing a parent container to the constructor.
+  ```gambas
+  Dim hForm As MyDialog
+  Dim hSuperControl As MyForm
+  hForm = New MyDialog
+  hSuperControl = New MyForm(Param1, Param2, MyDialog)
+  hSuperControl.Move(8, 8, 128, 64)
+  ```
+
+---
+
+### Forms in Gambas
+- A form in Gambas is an event observer, directly managing its own events such as **Resize**, **Activate**, etc.
+- This behavior is similar to Visual Basic forms.
+
+---
+
+### Control Groups
+- The **Group** property allows controls to share the same event handler while distinguishing the source.
+  ```gambas
+  Public Sub MyGroup_Click()
+    ' Handles event for the whole control group
+  End Sub
+  ```
+
+---
+
+### Event Handlers
+- Event observers in Gambas can handle events raised by any control in a group, with the event handler defined using the group name.
+  ```gambas
+  Public Sub MyButton_Click()
+    Print "You have clicked MyButton!"
+  End Sub
+  ```
+
+---
+
+### Subst$ Function
+- **Subst$()** replaces placeholders in a string with the given arguments.
+  - `Subst$("Substitution of &1, &2 and &3", "first", "second", "third")` results in `"Substitution of first, second, and third"`.
+
+---
+
+### String Translation
+- Gambas supports translatable strings using braces.
+  ```gambas
+  Print ("{Translate me}")
+  ```
+
+---
+
+### Empty String Testing
+- To check if a string is empty, you can test it directly, instead of using `Len()`.
+  ```gambas
+  If MyString THEN ...
+  If Not MyString THEN ...
+  ```
+
+---
+
+
+
+Here is the next set of extracted tips in a structured format for GPT training based on the recent images:
+
+---
+
+### Global Variables in Gambas
+- **No global variables** are allowed in Gambas.
+- As a workaround, global-like variables must be declared in the **main module** as `Public`.
+- If your project has no main module, but a main form, declare these variables as **Static Public** within the form.
+- Access these variables using the form or module name:  
+  - `MyMainModule.MyGlobalVariable`
+  - `MyMainForm.MyGlobalVariable`.
+
+---
+
+### Path Concatenation
+- Gambas allows concatenating file paths with the **&/** operator, automatically handling trailing slashes.
+  ```gambas
+  Print "/home/gambas" &/ ".bashrc"   ' → /home/gambas/.bashrc
+  Print "/home/gambas/" &/ "/tmp" &/ "foo.bar"   ' → /home/gambas/tmp/foo.bar
+  ```
+
+---
+
+### File Handling with Open
+- The **Open** instruction in Gambas differs from Visual Basic™.
+- In Gambas, files are returned as **File** objects rather than integers.
+  ```gambas
+  Dim handle As File
+  handle = Open "myfile" For Read
+  ```
+
+---
+
+### Startup Class
+- Each project in Gambas requires a **startup class**.
+- This class must define a **Main** method (without arguments) as the entry point.
+- Startup forms already have a predefined **Main** method, which instantiates and shows the form, similar to Visual Basic™.
+
+---
+
+### Editor Tips
+- **Two Types of Comments**:
+  ```gambas
+  ' Normal comment
+  '' Bold comment
+  ```
+  - **Bold comments** are typically used for documentation.
+  
+- **Code Snippets**:
+  - Type `main` + `TAB`: Inserts a static public `Main` startup function.
+  - Type `ds` + `TAB`: Inserts a local string variable declaration.
+
+---
+
+### Settings
+- Store and retrieve application settings easily with **Settings**.
+- To save the position of a form:
+  ```gambas
+  Settings.Write(TheForm)
+  ```
+- To recall the position:
+  ```gambas
+  Settings.Read(TheForm)
+  ```
+- To save and read other settings:
+  ```gambas
+  Settings["Slot/Key"] = Value
+  Value = Settings["Slot/Key", DefaultValue]
+  ```
+
+---
+
+### Default Icons
+- Use built-in icons for a better GUI experience, available in predefined sizes (`small`, `medium`, `large`, etc.).
+  ```gambas
+  Image1.Picture = Picture["icon:/32/warning"]
+  Image2.Picture = Picture["icon:/small/error"]
+  ```
+
+---
+
+### For Each Loops
+- Loop through arrays, collections, or enumerable classes using **For Each**.
+  ```gambas
+  For Each Node In Xml.Root.Children[i].Attributes
+    Print Node.Name;; Node.Value
+  Next
+  ```
+
+---
+
+### Optional Parameters
+- Functions in Gambas can have **optional arguments**.
+- Define an optional parameter using the **Optional** keyword, with or without a default value:
+  ```gambas
+  Private Sub MyFunction(Param AS String, Optional Optim AS String = "Default")
+    Print "Required: "; param; ", Optional: "; optim
+  End Sub
+  ```
+
+---
+
+### Error Management
+- Error management in Gambas uses **Try**, **Error**, **Catch**, and **Finally**.
+  ```gambas
+  Sub ProcessFile(FileName As String)
+    Try
+      Open FileName For Read As #hFile
+      ' File operations...
+    Finally
+      Close #hFile ' Always executed
+    Catch
+      Print "Cannot open file"; FileName
+    End
+  End Sub
+  ```
+
+---
+
+Here is the next batch of extracted tips from the images, formatted for your use:
+
+---
+
+### Error Management in Gambas
+
+1. **Error Management (1)**:
+   - Error management is handled using **Try**, **Error**, **Catch**, and **Finally**.
+   - Use `Try` to attempt an action and `Error` to check if it failed:
+     ```gambas
+     Try MyFile = Open "/etc/password" For Write
+     If Error Then Print "I cannot do what I want!"
+     ```
+
+2. **Error Management (2)**:
+   - The **Catch** block runs if an error occurs between the start and end of the function.
+   - If an error occurs in the try section, control passes to `Catch`.
+     ```gambas
+     Sub ProcessFile(FileName As String)
+       Open FileName For Read As #hFile
+       Close #hFile
+     Catch
+       Print "Cannot process file "; FileName
+     End
+     ```
+
+3. **Error Management (3)**:
+   - The **Finally** block is always executed, whether an error occurred or not.
+   - It is typically used for cleanup, like closing a file.
+     ```gambas
+     Sub ProcessFile(FileName As String)
+       Try
+         Open FileName For Read As #hFile
+       Finally
+         Close #hFile
+       Catch
+         Print "Cannot print file"; FileName
+       End
+     ```
+
+---
+
+### Assignment Operators
+- Gambas supports assignment operators similar to those in C/C++:
+  ```gambas
+  MyVariable += 2   ' Equivalent to MyVariable = MyVariable + 2
+  MyVariable *= 4   ' Equivalent to MyVariable = MyVariable * 4
+  MyVariable &= "Great"   ' Equivalent to MyVariable = MyVariable & "Great"
+  ```
+
+---
+
+### UTF-8 Strings
+- Gambas uses **UTF-8** to represent strings in memory.
+- Standard string functions like `Left$`, `Right$`, etc., handle only ASCII strings.
+- For UTF-8 strings, use methods from the **String** static class:
+  ```gambas
+  Print Len("bébé");; Left$("bébé", 3)   ' ASCII handling returns 6
+  Print String.Len("bébé");; String.Left("bébé", 3)   ' UTF-8 handling returns 4
+  ```
+
+---
+
+### Observer Class
+- The **Observer** class intercepts events before they are raised by an object.
+- Example of intercepting a keypress on a `TextBox`:
+  ```gambas
+  MyTextBox = New TextBox(Me) As "MyTextBox"
+  MyObserver = New Observer(MyTextBox) As "MyObserver"
+
+  Public Sub MyObserver_KeyPress()
+    Debug "Got it first"
+  End
+
+  Public Sub MyTextBox_KeyPress()
+    Debug "Got it next"
+  End
+  ```
+- Use `Stop Event` to prevent the event from continuing.
+
+---
+Based on the extracted content from the file "_lang_constants - Gambas Documentation.pdf," here is a structured breakdown of language constants in Gambas, formatted for your tutorial:
+
+---
+
+### Gambas Language Constants
+
+1. **Boolean Values**:
+   - **TRUE**: Represents the true value.
+   - **FALSE**: Represents the false value.
+
+2. **Integer Constants**:
+   - Standard integers:
+     - `0`, `123`, `-32769`, `10000000000`
+   - **Hexadecimal** signed integers:
+     - `&H1F5`, `&HFFFF`, `&H0000FFFF`, `&H10BF332E`
+   - **Hexadecimal** unsigned integers:
+     - `&H8000&`, `&HFFFF&`
+   - **Binary integers**:
+     - `&X1010010101`, `%101001011`
+
+3. **Floating Point Numbers**:
+   - Example values: `1.0`, `-5.345219E+45`
+   - **Positive Infinity**: `+INF`
+   - **Negative Infinity**: `-INF`
+
+4. **String Constants**:
+   - Standard string: `"Hello World!"`
+   - Translatable strings: `("This software is cool")`
+
+5. **Null Value**:
+   - **NULL**: Represents a null constant or void string.
+
+6. **String Escape Characters**:
+   - Gambas supports several escape characters in string literals:
+     - `\n` = Carriage return (Chr$(13))
+     - `\r` = Line feed (Chr$(10))
+     - `\t` = Tab (Chr$(9))
+     - `\b` = Backspace (Chr$(8))
+     - `\v` = Vertical tab (Chr$(11))
+     - `\f` = Form feed (Chr$(12))
+     - `\e` = Escape (Chr$(27))
+     - `\0` = Null character (Chr$(0))
+     - `\"` = Double quote
+     - `\\` = Backslash
+     - `\xNN` = Represents `Chr$(&HNN)` where `NN` is a hexadecimal number.
+
+---
+
