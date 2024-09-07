@@ -1,0 +1,107 @@
+' Gambas class file
+
+' Variables to keep track of zoom and panning
+Private zoomFactor As Float = 1.0
+Private panOffsetX As Float = 0
+Private panOffsetY As Float = 0
+Private dragging As Boolean = False
+Private lastMouseX As Integer
+Private lastMouseY As Integer
+
+' Handle drawing in the DrawingArea
+Public Sub DrawingArea1_Draw()
+
+    ' Apply scaling and panning transformations
+    Draw.Translate(panOffsetX, panOffsetY)
+    Draw.Scale(zoomFactor, zoomFactor)
+    
+    ' Draw a simple line from point (10, 10) to (200, 200)
+    Draw.Line(10, 10, 200, 200)
+    
+    ' Draw a rectangle with top-left corner at (50, 50), width 100, height 50
+    Draw.Rect(50, 50, 100, 50)
+    
+    ' Set the color for filling the rectangle (RGB color: Red)
+    Draw.FillColor = &HFF0000 ' Red color
+    
+    ' Fill a rectangle with color, adding the correct color argument
+    Draw.FillRect(200, 50, 100, 50, Color.Black)
+
+End
+
+' Handle mouse wheel event for zooming in and out (zoom below the mouse cursor)
+Public Sub DrawingArea1_MouseWheel()
+
+    ' Use Mouse.Delta to get the scroll wheel delta
+    Dim delta As Integer
+    delta = Mouse.Delta
+
+    ' Get the current mouse position
+    Dim mouseX As Float = Mouse.X
+    Dim mouseY As Float = Mouse.Y
+
+    ' Calculate the mouse position relative to the zoom and pan
+    Dim worldMouseX As Float = (mouseX - panOffsetX) / zoomFactor
+    Dim worldMouseY As Float = (mouseY - panOffsetY) / zoomFactor
+
+    ' Adjust the zoom factor for faster zooming
+    If delta > 0 Then
+        zoomFactor = zoomFactor * 1.3 ' Faster Zoom in
+    Else
+        zoomFactor = zoomFactor / 1.3 ' Faster Zoom out
+    Endif
+
+    ' Adjust the pan offsets so that zooming occurs under the mouse cursor
+    panOffsetX = mouseX - (worldMouseX * zoomFactor)
+    panOffsetY = mouseY - (worldMouseY * zoomFactor)
+
+    ' Redraw the DrawingArea after zooming
+    DrawingArea1.Refresh
+
+End
+
+' Handle mouse down event to start panning
+Public Sub DrawingArea1_MouseDown()
+
+    ' Track mouse starting position
+    dragging = True
+    lastMouseX = Mouse.X
+    lastMouseY = Mouse.Y
+
+End
+
+' Handle mouse move event for panning
+Public Sub DrawingArea1_MouseMove()
+
+    If dragging Then
+        ' Calculate the difference between the last position and the current one
+        panOffsetX = panOffsetX + (Mouse.X - lastMouseX)
+        panOffsetY = panOffsetY + (Mouse.Y - lastMouseY)
+        
+        ' Update last mouse position
+        lastMouseX = Mouse.X
+        lastMouseY = Mouse.Y
+        
+        ' Redraw the DrawingArea after panning
+        DrawingArea1.Refresh
+    Endif
+
+End
+
+' Handle mouse up event to stop panning
+Public Sub DrawingArea1_MouseUp()
+    dragging = False
+End
+
+' Optional: Reset zoom and pan to defaults when clicking a button
+Public Sub Button1_Click()
+
+    ' Reset zoom and pan
+    zoomFactor = 1.0
+    panOffsetX = 0
+    panOffsetY = 0
+    
+    ' Refresh the DrawingArea
+    DrawingArea1.Refresh
+
+End
