@@ -1,0 +1,134 @@
+' Gambas class file
+
+Static Public shapes As Variant
+
+' Variables for pan and zoom
+Private zoomLevel As Float = 1.0
+Private panOffsetX As Float = 0
+Private panOffsetY As Float = 0
+Private lastMouseX As Integer
+Private lastMouseY As Integer
+Private isDragging As Boolean = False
+
+Public Sub Form_Open()
+
+  Dim filePath As String = "shapes.json"
+  Dim jsonText As String
+
+  ' Load the JSON content from the file
+  jsonText = File.Load(filePath)
+
+  ' Decode the JSON content
+  shapes = Json.Decode(jsonText)["shapes"]
+
+End
+
+' Event for DrawingArea's draw event
+Public Sub DrawingArea1_Draw()
+
+  Dim shape As Variant
+
+  ' Apply zoom and pan transformations
+  Draw.Translate(panOffsetX, panOffsetY)
+  Draw.Scale(zoomLevel, zoomLevel)
+
+  ' Loop through each shape in the JSON
+  For Each shape In shapes
+    Draw.Begin(DrawingArea1)
+
+    Select Case shape["type"]
+      Case "line"
+        ' Draw a line
+        Draw.Line(shape["startX"], shape["startY"], shape["endX"], shape["endY"])
+
+      Case "rect"
+        ' Parse the color
+        Draw.FillColor = ParseColor(shape["fillColor"])
+        ' Draw a rectangle
+        Draw.FillRect(shape["x"], shape["y"], shape["width"], shape["height"], Color.Black)
+
+      Case "circle"
+        ' Parse the color
+        Draw.FillColor = ParseColor(shape["fillColor"])
+        ' Draw a circle
+        'Draw.FillEllipse(shape["centerX"] - shape["radius"], shape["centerY"] - shape["radius"], shape["radius"] * 2, shape["radius"] * 2)
+
+    End Select
+
+    Draw.End
+  Next
+
+End
+
+' Parse a hex color string (e.g., "#FF0000") into a Gambas color
+Private Function ParseColor(hexColor As String) As Integer
+  If Left(hexColor, 1) = "#" Then hexColor = Mid(hexColor, 2)
+  'Return &HFF000000 | CInt("&H" & hexColor)
+End
+
+' Mouse wheel event to handle zooming
+Public Sub DrawingArea1_MouseWheel()
+
+  ' Get mouse position relative to DrawingArea in screen coordinates
+  Dim mouseX As Float = Mouse.X - DrawingArea1.X
+  Dim mouseY As Float = Mouse.Y - DrawingArea1.Y
+
+  ' Convert mouse coordinates to world coordinates (before zoom and pan)
+  Dim worldMouseX As Float = (mouseX - panOffsetX) / zoomLevel
+  Dim worldMouseY As Float = (mouseY - panOffsetY) / zoomLevel
+
+  ' Zoom level adjustment (scrolling the mouse)
+  Dim zoomFactor As Float = 1.1
+  
+  ' Check Mouse.Delta for zoom direction
+  If Mouse.Delta > 0 Then
+    zoomLevel *= zoomFactor  ' Zoom in
+  Else If Mouse.Delta < 0 Then
+    zoomLevel /= zoomFactor  ' Zoom out
+  Endif
+
+  ' Adjust panOffset so that zoom occurs under the mouse pointer
+  panOffsetX = mouseX - worldMouseX * zoomLevel
+  panOffsetY = mouseY - worldMouseY * zoomLevel
+
+  ' Redraw the DrawingArea
+  DrawingArea1.Refresh
+
+End
+
+' Mouse down event to start dragging for panning
+Public Sub DrawingArea1_MouseDown()
+
+  isDragging = True
+  lastMouseX = Mouse.X
+  lastMouseY = Mouse.Y
+
+End
+
+' Mouse move event to handle panning
+Public Sub DrawingArea1_MouseMove()
+
+  If isDragging Then
+    Dim deltaX As Integer = Mouse.X - lastMouseX
+    Dim deltaY As Integer = Mouse.Y - lastMouseY
+
+    ' Update the pan offsets
+    panOffsetX += deltaX
+    panOffsetY += deltaY
+
+    ' Save the current mouse position
+    lastMouseX = Mouse.X
+    lastMouseY = Mouse.Y
+
+    ' Redraw the DrawingArea
+    DrawingArea1.Refresh
+  Endif
+
+End
+
+' Mouse up event to stop dragging
+Public Sub DrawingArea1_MouseUp()
+
+  isDragging = False
+
+End
