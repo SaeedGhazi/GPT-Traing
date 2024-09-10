@@ -1,0 +1,23 @@
+{
+  "regulations": {
+    "rule1": {
+      "word": "VVV",
+      "answer": "111"
+    },
+    "rule2": {
+      "word": "BBB",
+      "answer": "222"
+    }
+  },
+  "Sources": {
+    "source1": "Hafez(p)",
+    "source2": "Saadi(!)"
+  },
+  "Words": {
+    "word1": {
+      "Persian": "سلام",
+      "English": "salAm",
+      "Metric": "U_"
+    }
+  }
+}
