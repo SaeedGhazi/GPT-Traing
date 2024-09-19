@@ -1,0 +1,381 @@
+Formulas|Descriptions
+angle_radians = (pi/180) * angle_degrees|Converts an angle from degrees to radians.
+angle_degrees = (180/pi) * angle_radians|Converts an angle from radians to degrees.
+distance_radians = (pi/(180*60)) * distance_nm|Converts distance from nautical miles to radians.
+distance_nm = ((180*60)/pi) * distance_radians|Converts distance from radians to nautical miles.
+distance_km = radius_km * distance_radians|Converts distance from radians to kilometers using a specified radius of the Earth.
+distance_radians = distance_km / radius_km|Converts distance from kilometers to radians using a specified radius of the Earth.
+d = acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon1 - lon2))|Calculates the great circle distance between two points using their latitude and longitude coordinates. Suitable for longer distances.
+d = 2 * asin(sqrt((sin((lat1 - lat2) / 2))^2 + cos(lat1) * cos(lat2) * (sin((lon1 - lon2) / 2))^2))|Calculates the great circle distance between two points using their latitude and longitude coordinates. More accurate for shorter distances due to reduced rounding errors.
+IF (cos(lat1) < EPS)|Checks if the initial point is at a pole using a small number EPS to handle precision.
+IF (lat1 > 0) tc1 = pi|Sets the initial course to pi if starting from the North Pole.
+ELSE tc1 = 2*pi|Sets the initial course to 2*pi if starting from the South Pole.
+IF sin(lon2-lon1) < 0 tc1 = acos((sin(lat2) - sin(lat1) * cos(d)) / (sin(d) * cos(lat1)))|Calculates the initial course from point 1 to point 2 when the sine of the longitude difference is negative.
+ELSE tc1 = 2*pi - acos((sin(lat2) - sin(lat1) * cos(d)) / (sin(d) * cos(lat1)))|Calculates the initial course from point 1 to point 2 when the sine of the longitude difference is positive.
+tc1 = mod(atan2(sin(lon1 - lon2) * cos(lat2), cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon1 - lon2)), 2*pi)|An alternative formula to compute the initial course without pre-computing the distance between points.
+lat = atan((sin(lat1) * cos(lat2) * sin(lon - lon2) - sin(lat2) * cos(lat1) * sin(lon - lon1)) / (cos(lat1) * cos(lat2) * sin(lon1 - lon2)))|Calculates the latitude of an intermediate point on the great circle connecting two points. Not applicable for meridians where sin(lon1 - lon2) = 0.
+lat = asin(sin(lat1) * cos(d) + cos(lat1) * sin(d) * cos(tc))|Calculates the latitude of a point at a distance 'd' along a track 'tc' from a starting point.
+IF (cos(lat) = 0) lon = lon1|If the calculated latitude is at the pole, the longitude remains the same as the starting point's longitude.
+ELSE lon = mod(lon1 - asin(sin(tc) * sin(d) / cos(lat)) + pi, 2*pi) - pi|Calculates the longitude of a point at a distance 'd' along a track 'tc' from a starting point when not at a pole.
+lat = asin(sin(lat1) * cos(d) + cos(lat1) * sin(d) * cos(tc))|General formula to calculate latitude for longer distances.
+dlon = atan2(sin(tc) * sin(d) * cos(lat1), cos(d) - sin(lat1) * sin(lat))|Calculates the difference in longitude for longer distances.
+lon = mod(lon1 - dlon + pi, 2*pi) - pi|Calculates the longitude using the longitude difference for longer distances, ensuring it stays within the valid range.
+dst12 = 2 * asin(sqrt((sin((lat1 - lat2) / 2))^2 + cos(lat1) * cos(lat2) * sin((lon1 - lon2) / 2)^2))|Calculates the great circle distance between points 1 and 2.
+IF sin(lon2 - lon1) < 0 crs12 = acos((sin(lat2) - sin(lat1) * cos(dst12)) / (sin(dst12) * cos(lat1)))|Calculates the initial course from point 1 to point 2 when the sine of the longitude difference is negative.
+ELSE crs12 = 2 * pi - acos((sin(lat2) - sin(lat1) * cos(dst12)) / (sin(dst12) * cos(lat1)))|Calculates the initial course from point 1 to point 2 when the sine of the longitude difference is positive.
+crs21 = 2 * pi - acos((sin(lat1) - sin(lat2) * cos(dst12)) / (sin(dst12) * cos(lat2)))|Calculates the reverse course from point 2 to point 1 when the sine of the longitude difference is negative.
+crs21 = acos((sin(lat1) - sin(lat2) * cos(dst12)) / (sin(dst12) * cos(lat2)))|Calculates the reverse course from point 2 to point 1 when the sine of the longitude difference is positive.
+ang1 = mod(crs13 - crs12 + pi, 2 * pi) - pi|Computes the angular difference between the course from point 1 to the intersection and the course from point 1 to point 2.
+ang2 = mod(crs21 - crs23 + pi, 2 * pi) - pi|Computes the angular difference between the course from point 2 to the intersection and the course from point 2 to point 1.
+IF (sin(ang1) = 0 AND sin(ang2) = 0)|Indicates there are an infinite number of intersections.
+ELSEIF sin(ang1) * sin(ang2) < 0|Indicates the intersection is ambiguous.
+ELSE ang3 = acos(-cos(ang1) * cos(ang2) + sin(ang1) * sin(ang2) * cos(dst12))|Calculates the interior angle of the spherical triangle formed by points 1, 2, and the intersection.
+dst13 = atan2(sin(dst12) * sin(ang1) * sin(ang2), cos(ang2) + cos(ang1) * cos(ang3))|Calculates the distance from point 1 to the intersection.
+lat3 = asin(sin(lat1) * cos(dst13) + cos(lat1) * sin(dst13) * cos(crs13))|Calculates the latitude of the intersection point.
+dlon = atan2(sin(crs13) * sin(dst13) * cos(lat1), cos(dst13) - sin(lat1) * sin(lat3))|Calculates the difference in longitude for the intersection point.
+lon3 = mod(lon1 - dlon + pi, 2 * pi) - pi|Calculates the longitude of the intersection point, ensuring it remains within valid range.
+sin(tc) * cos(lat) = constant|Clairaut's formula which states that the product of the sine of the true course and the cosine of the latitude is constant along any great circle.
+sin(tc1) * cos(lat1) = sin(tc2) * cos(lat2)|Relates the true course and latitude of any two points on the same great circle.
+latmx = acos(abs(sin(tc) * cos(lat)))|Calculates the highest latitude reached on a great circle given the true course and latitude at any point.
+l12 = lon1 - lon2|Calculates the difference in longitude between two points on the great circle.
+A = sin(lat1) * cos(lat2) * cos(lat3) * sin(l12)|Intermediate value used to find the crossing points of the great circle with a parallel.
+B = sin(lat1) * cos(lat2) * cos(lat3) * cos(l12) - cos(lat1) * sin(lat2) * cos(lat3)|Intermediate value used to find the crossing points of the great circle with a parallel.
+C = cos(lat1) * cos(lat2) * sin(lat3) * sin(l12)|Intermediate value used to determine if the great circle crosses the given parallel.
+lon = atan2(B, A)|Computes the base longitude using the atan2 function for the crossing points.
+IF (abs(C) > sqrt(A^2 + B^2))|"Checks if the great circle crosses the parallel, indicating ""no crossing"" if true."
+dlon = acos(C / sqrt(A^2 + B^2))|Calculates the difference in longitude at the crossing points if they exist.
+lon3_1 = mod(lon1 + dlon + lon + pi, 2 * pi) - pi|Calculates the first longitude where the great circle crosses the given parallel.
+lon3_2 = mod(lon1 - dlon + lon + pi, 2 * pi) - pi|Calculates the second longitude where the great circle crosses the given parallel.
+A = sin((1 - f) * d) / sin(d)|Calculates the weighting factor A based on the fraction of the distance f along the great circle.
+B = sin(f * d) / sin(d)|Calculates the weighting factor B based on the fraction of the distance f along the great circle.
+x = A * cos(lat1) * cos(lon1) + B * cos(lat2) * cos(lon2)|Intermediate x-coordinate for the point a fraction f along the great circle.
+y = A * cos(lat1) * sin(lon1) + B * cos(lat2) * sin(lon2)|Intermediate y-coordinate for the point a fraction f along the great circle.
+z = A * sin(lat1) + B * sin(lat2)|Intermediate z-coordinate for the point a fraction f along the great circle.
+lat = atan2(z, sqrt(x^2 + y^2))|Calculates the latitude of the point a fraction f along the great circle.
+lon = atan2(y, x)|Calculates the longitude of the point a fraction f along the great circle.
+XTD = asin(sin(dist_AD) * sin(crs_AD - crs_AB))|Calculates the cross track error (XTD), which is the perpendicular distance from the point D to the great circle route from A to B. Positive XTD indicates right of course, negative indicates left.
+ATD = acos(cos(dist_AD) / cos(XTD))|Calculates the along track distance (ATD), the distance from point A along the course towards point B to the point abeam D.
+ATD = asin(sqrt((sin(dist_AD))^2 - (sin(XTD))^2) / cos(XTD))|Alternative formula for the along track distance for very short distances, less susceptible to rounding errors.
+A = crs_AD - crs_AB|Difference in initial great circle bearings from A to B and A to D.
+r = (cos(b)^2 + sin(b)^2 * cos(A)^2)^(1/2)|Intermediate value to determine the existence of points on the great circle at a specific distance from point D.
+p = atan2(sin(b) * cos(A), cos(b))|Calculates the along track distance in radians from A towards B.
+IF (cos(d)^2 > r^2) THEN No points exist|Checks if there are any points on the great circle at the given distance d from point D.
+dp = p +- acos(cos(d) / r)|Calculates the distances of the desired points from A along the great circle route AB, where the points lie at a distance d from D.
+acos(x) = atan2(sqrt(1 - x^2), x)|Computes the arc-cosine using the atan2 function when acos is unavailable.
+asin(x) = atan2(x, sqrt(1 - x^2))|Computes the arc-sine using the atan2 function when asin is unavailable.
+asin(x) = 2 * atan(x / (1 + sqrt(1 - x*x)))|Computes the arc-sine using only the atan function.
+acos(x) = 2 * atan(sqrt((1 - x) / (1 + x)))|Computes the arc-cosine using only the atan function when x >= 0.
+acos(x) = pi - 2 * atan(sqrt((1 + x) / (1 - x)))|Computes the arc-cosine using only the atan function when x < 0.
+atan2(y, x) = atan(y / x)|Computes the atan2 using atan when x > 0.
+atan2(y, x) = atan(y / x) + pi|Computes the atan2 using atan when x < 0 and y >= 0.
+atan2(y, x) = pi/2|Returns the value for atan2 when x = 0 and y > 0.
+atan2(y, x) = atan(y / x) - pi|Computes the atan2 using atan when x < 0 and y < 0.
+atan2(y, x) = -pi/2|Returns the value for atan2 when x = 0 and y < 0.
+asin_safe(x) = asin(max(-1, min(x, 1)))|A safe version of the asin function to handle rounding errors that might cause the argument to exceed 1 in magnitude.
+acos_safe(x) = acos(max(-1, min(x, 1)))|A safe version of the acos function to handle rounding errors that might cause the argument to exceed 1 in magnitude.
+mod(y, x) = y - x * floor(y / x)|Calculates the remainder of y divided by x, ensuring the result is always in the range 0 <= mod < x.
+IF (mod < 0) mod = mod + x|Adjusts the result of mod to ensure it is non-negative if necessary.
+angle_radians = (pi/180) * angle_degrees|Converts an angle from degrees to radians.
+angle_degrees = (180/pi) * angle_radians|Converts an angle from radians to degrees.
+distance_radians = (pi/(180*60)) * distance_nm|Converts distance from nautical miles to radians.
+distance_nm = ((180*60)/pi) * distance_radians|Converts distance from radians to nautical miles.
+distance_km = radius_km * distance_radians|Converts distance from radians to kilometers using a specified radius of the Earth.
+distance_radians = distance_km / radius_km|Converts distance from kilometers to radians using a specified radius of the Earth.
+d = acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon1 - lon2))|Calculates the great circle distance between two points using their latitude and longitude coordinates. Suitable for longer distances.
+d = 2 * asin(sqrt((sin((lat1 - lat2) / 2))^2 + cos(lat1) * cos(lat2) * (sin((lon1 - lon2) / 2))^2))|Calculates the great circle distance between two points using their latitude and longitude coordinates. More accurate for shorter distances due to reduced rounding errors.
+IF (cos(lat1) < EPS)|Checks if the initial point is at a pole using a small number EPS to handle precision.
+IF (lat1 > 0) tc1 = pi|Sets the initial course to pi if starting from the North Pole.
+ELSE tc1 = 2*pi|Sets the initial course to 2*pi if starting from the South Pole.
+IF sin(lon2-lon1) < 0 tc1 = acos((sin(lat2) - sin(lat1) * cos(d)) / (sin(d) * cos(lat1)))|Calculates the initial course from point 1 to point 2 when the sine of the longitude difference is negative.
+ELSE tc1 = 2*pi - acos((sin(lat2) - sin(lat1) * cos(d)) / (sin(d) * cos(lat1)))|Calculates the initial course from point 1 to point 2 when the sine of the longitude difference is positive.
+tc1 = mod(atan2(sin(lon1 - lon2) * cos(lat2), cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon1 - lon2)), 2*pi)|An alternative formula to compute the initial course without pre-computing the distance between points.
+lat = atan((sin(lat1) * cos(lat2) * sin(lon - lon2) - sin(lat2) * cos(lat1) * sin(lon - lon1)) / (cos(lat1) * cos(lat2) * sin(lon1 - lon2)))|Calculates the latitude of an intermediate point on the great circle connecting two points. Not applicable for meridians where sin(lon1 - lon2) = 0.
+lat = asin(sin(lat1) * cos(d) + cos(lat1) * sin(d) * cos(tc))|Calculates the latitude of a point at a distance 'd' along a track 'tc' from a starting point.
+IF (cos(lat) = 0) lon = lon1|If the calculated latitude is at the pole, the longitude remains the same as the starting point's longitude.
+ELSE lon = mod(lon1 - asin(sin(tc) * sin(d) / cos(lat)) + pi, 2*pi) - pi|Calculates the longitude of a point at a distance 'd' along a track 'tc' from a starting point when not at a pole.
+lat = asin(sin(lat1) * cos(d) + cos(lat1) * sin(d) * cos(tc))|General formula to calculate latitude for longer distances.
+dlon = atan2(sin(tc) * sin(d) * cos(lat1), cos(d) - sin(lat1) * sin(lat))|Calculates the difference in longitude for longer distances.
+lon = mod(lon1 - dlon + pi, 2*pi) - pi|Calculates the longitude using the longitude difference for longer distances, ensuring it stays within the valid range.
+dst12 = 2 * asin(sqrt((sin((lat1 - lat2) / 2))^2 + cos(lat1) * cos(lat2) * sin((lon1 - lon2) / 2)^2))|Calculates the great circle distance between points 1 and 2.
+IF sin(lon2 - lon1) < 0 crs12 = acos((sin(lat2) - sin(lat1) * cos(dst12)) / (sin(dst12) * cos(lat1)))|Calculates the initial course from point 1 to point 2 when the sine of the longitude difference is negative.
+ELSE crs12 = 2 * pi - acos((sin(lat2) - sin(lat1) * cos(dst12)) / (sin(dst12) * cos(lat1)))|Calculates the initial course from point 1 to point 2 when the sine of the longitude difference is positive.
+crs21 = 2 * pi - acos((sin(lat1) - sin(lat2) * cos(dst12)) / (sin(dst12) * cos(lat2)))|Calculates the reverse course from point 2 to point 1 when the sine of the longitude difference is negative.
+crs21 = acos((sin(lat1) - sin(lat2) * cos(dst12)) / (sin(dst12) * cos(lat2)))|Calculates the reverse course from point 2 to point 1 when the sine of the longitude difference is positive.
+ang1 = mod(crs13 - crs12 + pi, 2 * pi) - pi|Computes the angular difference between the course from point 1 to the intersection and the course from point 1 to point 2.
+ang2 = mod(crs21 - crs23 + pi, 2 * pi) - pi|Computes the angular difference between the course from point 2 to the intersection and the course from point 2 to point 1.
+IF (sin(ang1) = 0 AND sin(ang2) = 0)|Indicates there are an infinite number of intersections.
+ELSEIF sin(ang1) * sin(ang2) < 0|Indicates the intersection is ambiguous.
+ELSE ang3 = acos(-cos(ang1) * cos(ang2) + sin(ang1) * sin(ang2) * cos(dst12))|Calculates the interior angle of the spherical triangle formed by points 1, 2, and the intersection.
+dst13 = atan2(sin(dst12) * sin(ang1) * sin(ang2), cos(ang2) + cos(ang1) * cos(ang3))|Calculates the distance from point 1 to the intersection.
+lat3 = asin(sin(lat1) * cos(dst13) + cos(lat1) * sin(dst13) * cos(crs13))|Calculates the latitude of the intersection point.
+dlon = atan2(sin(crs13) * sin(dst13) * cos(lat1), cos(dst13) - sin(lat1) * sin(lat3))|Calculates the difference in longitude for the intersection point.
+lon3 = mod(lon1 - dlon + pi, 2 * pi) - pi|Calculates the longitude of the intersection point, ensuring it remains within valid range.
+sin(tc) * cos(lat) = constant|Clairaut's formula which states that the product of the sine of the true course and the cosine of the latitude is constant along any great circle.
+sin(tc1) * cos(lat1) = sin(tc2) * cos(lat2)|Relates the true course and latitude of any two points on the same great circle.
+latmx = acos(abs(sin(tc) * cos(lat)))|Calculates the highest latitude reached on a great circle given the true course and latitude at any point.
+l12 = lon1 - lon2|Calculates the difference in longitude between two points on the great circle.
+A = sin(lat1) * cos(lat2) * cos(lat3) * sin(l12)|Intermediate value used to find the crossing points of the great circle with a parallel.
+B = sin(lat1) * cos(lat2) * cos(lat3) * cos(l12) - cos(lat1) * sin(lat2) * cos(lat3)|Intermediate value used to find the crossing points of the great circle with a parallel.
+C = cos(lat1) * cos(lat2) * sin(lat3) * sin(l12)|Intermediate value used to determine if the great circle crosses the given parallel.
+lon = atan2(B, A)|Computes the base longitude using the atan2 function for the crossing points.
+IF (abs(C) > sqrt(A^2 + B^2))|"Checks if the great circle crosses the parallel, indicating ""no crossing"" if true."
+dlon = acos(C / sqrt(A^2 + B^2))|Calculates the difference in longitude at the crossing points if they exist.
+lon3_1 = mod(lon1 + dlon + lon + pi, 2 * pi) - pi|Calculates the first longitude where the great circle crosses the given parallel.
+lon3_2 = mod(lon1 - dlon + lon + pi, 2 * pi) - pi|Calculates the second longitude where the great circle crosses the given parallel.
+A = sin((1 - f) * d) / sin(d)|Calculates the weighting factor A based on the fraction of the distance f along the great circle.
+B = sin(f * d) / sin(d)|Calculates the weighting factor B based on the fraction of the distance f along the great circle.
+x = A * cos(lat1) * cos(lon1) + B * cos(lat2) * cos(lon2)|Intermediate x-coordinate for the point a fraction f along the great circle.
+y = A * cos(lat1) * sin(lon1) + B * cos(lat2) * sin(lon2)|Intermediate y-coordinate for the point a fraction f along the great circle.
+z = A * sin(lat1) + B * sin(lat2)|Intermediate z-coordinate for the point a fraction f along the great circle.
+lat = atan2(z, sqrt(x^2 + y^2))|Calculates the latitude of the point a fraction f along the great circle.
+lon = atan2(y, x)|Calculates the longitude of the point a fraction f along the great circle.
+XTD = asin(sin(dist_AD) * sin(crs_AD - crs_AB))|Calculates the cross track error (XTD), which is the perpendicular distance from the point D to the great circle route from A to B. Positive XTD indicates right of course, negative indicates left.
+ATD = acos(cos(dist_AD) / cos(XTD))|Calculates the along track distance (ATD), the distance from point A along the course towards point B to the point abeam D.
+ATD = asin(sqrt((sin(dist_AD))^2 - (sin(XTD))^2) / cos(XTD))|Alternative formula for the along track distance for very short distances, less susceptible to rounding errors.
+A = crs_AD - crs_AB|Difference in initial great circle bearings from A to B and A to D.
+r = (cos(b)^2 + sin(b)^2 * cos(A)^2)^(1/2)|Intermediate value to determine the existence of points on the great circle at a specific distance from point D.
+p = atan2(sin(b) * cos(A), cos(b))|Calculates the along track distance in radians from A towards B.
+IF (cos(d)^2 > r^2) THEN No points exist|Checks if there are any points on the great circle at the given distance d from point D.
+dp = p +- acos(cos(d) / r)|Calculates the distances of the desired points from A along the great circle route AB, where the points lie at a distance d from D.
+acos(x) = atan2(sqrt(1 - x^2), x)|Computes the arc-cosine using the atan2 function when acos is unavailable.
+asin(x) = atan2(x, sqrt(1 - x^2))|Computes the arc-sine using the atan2 function when asin is unavailable.
+asin(x) = 2 * atan(x / (1 + sqrt(1 - x*x)))|Computes the arc-sine using only the atan function.
+acos(x) = 2 * atan(sqrt((1 - x) / (1 + x)))|Computes the arc-cosine using only the atan function when x >= 0.
+acos(x) = pi - 2 * atan(sqrt((1 + x) / (1 - x)))|Computes the arc-cosine using only the atan function when x < 0.
+atan2(y, x) = atan(y / x)|Computes the atan2 using atan when x > 0.
+atan2(y, x) = atan(y / x) + pi|Computes the atan2 using atan when x < 0 and y >= 0.
+atan2(y, x) = pi/2|Returns the value for atan2 when x = 0 and y > 0.
+atan2(y, x) = atan(y / x) - pi|Computes the atan2 using atan when x < 0 and y < 0.
+atan2(y, x) = -pi/2|Returns the value for atan2 when x = 0 and y < 0.
+asin_safe(x) = asin(max(-1, min(x, 1)))|A safe version of the asin function to handle rounding errors that might cause the argument to exceed 1 in magnitude.
+acos_safe(x) = acos(max(-1, min(x, 1)))|A safe version of the acos function to handle rounding errors that might cause the argument to exceed 1 in magnitude.
+mod(y, x) = y - x * floor(y / x)|Calculates the remainder of y divided by x, ensuring the result is always in the range 0 <= mod < x.
+IF (mod < 0) mod = mod + x|Adjusts the result of mod to ensure it is non-negative if necessary.
+sin(a) / sin(A) = sin(b) / sin(B) = sin(c) / sin(C)|Relates the sides and angles of a spherical triangle using the law of sines.
+cos(a) = cos(b) * cos(c) + sin(b) * sin(c) * cos(A)|Law of cosines for spherical triangles, relating side 'a' and angles.
+cos(b) = cos(c) * cos(a) + sin(c) * sin(a) * cos(B)|Law of cosines for spherical triangles, relating side 'b' and angles.
+cos(c) = cos(a) * cos(b) + sin(a) * sin(b) * cos(C)|Law of cosines for spherical triangles, relating side 'c' and angles.
+cos(A) = -cos(B) * cos(C) + sin(B) * sin(C) * cos(a)|Law of cosines for spherical triangles, relating angle 'A' and sides.
+cos(B) = -cos(C) * cos(A) + sin(C) * sin(A) * cos(b)|Law of cosines for spherical triangles, relating angle 'B' and sides.
+cos(C) = -cos(A) * cos(B) + sin(A) * sin(B) * cos(c)|Law of cosines for spherical triangles, relating angle 'C' and sides.
+tan(A) = sin(B) * sin(a) / (sin(c) * cos(a) - cos(B) * cos(c) * sin(a))|Relates angle 'A' and sides 'a' and 'b' in a spherical triangle.
+tan(B) = sin(C) * sin(b) / (sin(a) * cos(b) - cos(C) * cos(a) * sin(b))|Relates angle 'B' and sides 'b' and 'c' in a spherical triangle.
+tan(C) = sin(A) * sin(c) / (sin(b) * cos(c) - cos(A) * cos(b) * sin(c))|Relates angle 'C' and sides 'c' and 'a' in a spherical triangle.
+tan(a) = sin(b) * sin(A) / (sin(C) * cos(A) + cos(b) * cos(C) * sin(A))|Relates side 'a' and angles 'A' and 'B' in a spherical triangle.
+tan(b) = sin(c) * sin(B) / (sin(A) * cos(B) + cos(c) * cos(A) * sin(B))|Relates side 'b' and angles 'B' and 'C' in a spherical triangle.
+tan(c) = sin(a) * sin(C) / (sin(B) * cos(C) + cos(a) * cos(B) * sin(C))|Relates side 'c' and angles 'C' and 'A' in a spherical triangle.
+a =acos(cos(b) * cos(c) + sin(b) * sin(c) * cos(A))|Solves a spherical triangle given two sides and the included angle.
+B = acos((cos(b) - cos(c) * cos(a)) / (sin(c) * sin(a)))|Finds angle 'B' given sides 'a', 'b', and 'c'.
+C = acos((cos(c) - cos(a) * cos(b)) / (sin(a) * sin(b)))|Finds angle 'C' given sides 'a', 'b', and 'c'.
+A = acos(-cos(B) * cos(C) + sin(B) * sin(C) * cos(a))|Finds angle 'A' given two angles and the included side.
+b = atan2(sin(a) * sin(B) * sin(C), cos(B) + cos(C) * cos(A))|Finds side 'b' given angle 'A' and two other angles.
+c = atan2(sin(a) * sin(B) * sin(C), cos(C) + cos(A) * cos(B))|Finds side 'c' given angle 'A' and two other angles.
+A = acos((cos(a) - cos(b) * cos(c)) / (sin(b) * sin(c)))|Solves a spherical triangle given three sides.
+delta = (A + B + C - pi) / 2|Calculates the spherical excess, used to find the area of the spherical triangle.
+a = 2 * asin(sqrt(sin(delta) * sin(A - delta) / (sin(B) * sin(C))))|Calculates side 'a' given three angles.
+Area = E * R^2|Calculates the surface area enclosed by a spherical triangle using the spherical excess E.
+E = 4 * atan(sqrt(tan(s/2) * tan((s - a)/2) * tan((s - b)/2) * tan((s - c)/2)))|Calculates the spherical excess E given the sides of the triangle.
+s = (a + b + c) / 2|Semi-perimeter of the spherical triangle.
+sin(A/2) = sqrt((sin(s - b) * sin(s - c)) / (sin(b) * sin(c)))|Finds half-angle 'A' using the sides of the triangle.
+cos(A/2) = sqrt((sin(s) * sin(s - a)) / (sin(b) * sin(c)))|Finds half-angle 'A' using the sides of the triangle.
+tan(A/2) = sin((b - c)/2) / (sin((b + c)/2) * tan((B - C)/2))|Calculates half-angle 'A' using sides 'b' and 'c' and angles 'B' and 'C'.
+tan(A/2) = cos((b - c)/2) / (cos((b + c)/2) * tan((B + C)/2))|Alternative way to calculate half-angle 'A' using sides 'b' and 'c' and angles 'B' and 'C'.
+tan(a/2) = cos((B + C)/2) * tan((b + c)/2) / cos((B - C)/2)|Calculates half-side 'a' using angles 'B' and 'C' and sides 'b' and 'c'.
+tan(a/2) = sin((B + C)/2) * tan((b - c)/2) / sin((B - C)/2)|Alternative way to calculate half-side 'a' using angles 'B' and 'C' and sides 'b' and 'c'.
+tan((A - B)/2) = cot(C/2) * sin((a - b)/2) / sin((a + b)/2)|Calculates half-angle difference for 'A' and 'B' using side 'C'.
+tan((A + B)/2) = cot(C/2) * cos((a - b)/2) / cos((a + b)/2)|Calculates half-angle sum for 'A' and 'B' using side 'C'.
+sin(a) * cos(B) = cos(b) * sin(c) - sin(b) * cos(c) * cos(A)|Relates side 'a' and angle 'B' in a spherical triangle.
+cos(a) * cos(C) = sin(a) * cot(b) - sin(C) * cot(B)|Relates side 'a' and angle 'C' in a spherical triangle.
+cos(A) = sin(C) * cos(a)|Napier's rule for right spherical triangles.
+cos(C) = sin(A) * cos(c)|Napier's rule for right spherical triangles.
+sin(a) = sin(A) * sin(b)|Napier's rule for right spherical triangles.
+sin(c) = sin(C) * sin(b)|Napier's rule for right spherical triangles.
+tan(a) = tan(b) * cos(C) = sin(c) * tan(A)|Napier's rule for right spherical triangles.
+tan(c) = tan(b) * cos(A) = sin(a) * tan(C)|Napier's rule for right spherical triangles.
+cos(b) = cos(a) * cos(c) = 1 / (tan(A) * tan(C))|Napier's rule for right spherical triangles.
+lon2 - lon1 = -tan(tc) * (log((1 + sin(lat2)) / cos(lat2)) - log((1 + sin(lat1)) / cos(lat1)))|Relates the change in longitude to the true course and latitudes of two points connected by a rhumb line.
+lon2 - lon1 = -tan(tc) * (log((1 + tan(lat2/2)) / (1 - tan(lat2/2))) - log((1 + tan(lat1/2)) / (1 - tan(lat1/2))))|Alternative form using tangent function for calculating the change in longitude.
+lon2 - lon1 = -tan(tc) * log(tan(lat2/2 + pi/4) / tan(lat1/2 + pi/4))|Simplified formula using natural logarithms and tangent function.
+tc = mod(atan2(lon1 - lon2, log(tan(lat2/2 + pi/4) / tan(lat1/2 + pi/4))), 2 * pi)|Calculates the true course between two points connected by a rhumb line.
+IF (abs(lat2 - lat1) < sqrt(TOL)) q = cos(lat1)|Checks if the latitudes are approximately equal to avoid indeterminacies and sets q to the cosine of latitude.
+q = (lat2 - lat1) / log(tan(lat2/2 + pi/4) / tan(lat1/2 + pi/4))|Calculates the factor q when latitudes are different, used in distance calculation.
+d = sqrt((lat2 - lat1)^2 + q^2 * (lon2 - lon1)^2)|Calculates the distance between two points along a rhumb line.
+dlon_W = mod(lon2 - lon1, 2 * pi)|Calculates the westerly difference in longitude considering crossing the 180° meridian.
+dlon_E = mod(lon1 - lon2, 2 * pi)|Calculates the easterly difference in longitude considering crossing the 180° meridian.
+dphi = log(tan(lat2/2 + pi/4) / tan(lat1/2 + pi/4))|Computes the difference in latitude using the tangent function and natural logarithms.
+IF (dlon_W < dlon_E) tc = mod(atan2(-dlon_W, dphi), 2 * pi)|Determines if the westerly rhumb line is the shortest and calculates the true course.
+d = sqrt(q^2 * dlon_W^2 + (lat2 - lat1)^2)|Calculates the shortest rhumb line distance using westerly difference.
+IF (dlon_W >= dlon_E) tc = mod(atan2(dlon_E, dphi), 2 * pi)|Determines if the easterly rhumb line is the shortest and calculates the true course.
+d = sqrt(q^2 * dlon_E^2 + (lat2 - lat1)^2)|Calculates the shortest rhumb line distance using easterly difference.
+lat = lat1 + d * cos(tc)|Calculates the latitude of a point on a rhumb line given the distance and true course.
+IF (abs(lat) > pi/2)|Checks if the latitude is beyond the poles, indicating the distance is too large for this rhumb line.
+IF (abs(lat - lat1) < sqrt(TOL)) q = cos(lat1)|Checks if the latitudes are approximately equal to avoid indeterminacies and sets q.
+dphi = log(tan(lat/2 + pi/4) / tan(lat1/2 + pi/4))|Computes the change in latitude using the tangent function and natural logarithms.
+q = (lat - lat1) / dphi|Calculates the factor q for a given change in latitude.
+dlon = -d * sin(tc) / q|Computes the change in longitude for the rhumb line.
+lon = mod(lon1 + dlon + pi, 2 * pi) - pi|Calculates the longitude of the point on the rhumb line, ensuring it remains within the valid range.
+distance_North = R1 * dlat|Calculates the northward distance from a fixed point using the meridional radius of curvature and the change in latitude.
+distance_East = R2 * cos(lat0) * dlon|Calculates the eastward distance from a fixed point using the radius of curvature in the prime vertical, the change in longitude, and the cosine of the fixed latitude.
+R1 = a * (1 - e^2) / (1 - e^2 * (sin(lat0))^2)^(3/2)|Computes the meridional radius of curvature using the equatorial radius and eccentricity squared.
+R2 = a / sqrt(1 - e^2 * (sin(lat0))^2)|Computes the radius of curvature in the prime vertical using the equatorial radius and eccentricity squared.
+e^2 = f * (2 - f)|Calculates the eccentricity squared using the flattening factor.
+f = 1 / 298.257223563|The flattening factor for the WGS84 ellipsoid model.
+a = 6378.137000 km|The equatorial radius of the Earth for the WGS84 model.
+distance = sqrt(distance_North^2 + distance_East^2)|Calculates the straight-line distance using Pythagorean theorem in the flat earth approximation.
+bearing to (lat, lon) = mod(atan2(distance_East, distance_North), 2 * pi)|Calculates the bearing to a point using plane trigonometry.
+bearing to (lat, lon) = mod(atan2(cos(lat0) * dlon, dlat), 2 * pi)|Calculates the bearing to a point using spherical coordinates.
+angle_radians = (pi / 180) * angle_degrees|Converts an angle from degrees to radians.
+angle_degrees = (180 / pi) * angle_radians|Converts an angle from radians to degrees.
+angle_degrees = degrees + (minutes / 60) + (seconds / 3600)|Converts degrees, minutes, and seconds to decimal degrees.
+degrees = int(angle_degrees)|Extracts the whole number of degrees from a decimal degree value.
+minutes = int(60 * (angle_degrees - degrees))|Extracts the minutes component from a decimal degree value.
+seconds = 60 * (60 * (angle_degrees - degrees) - minutes)|Extracts the seconds component from a decimal degree value.
+WS = sqrt((TAS - GS)^2 + 4 * TAS * GS * (sin((HD - CRS) / 2))^2)|Calculates the wind speed given the true airspeed, groundspeed, heading, and course.
+WD = CRS + atan2(TAS * sin(HD - CRS), TAS * cos(HD - CRS) - GS)|Calculates the wind direction given the true airspeed, groundspeed, heading, and course.
+IF (WD < 0) THEN WD = WD + 2 * pi|Adjusts the wind direction to be within the range of 0 to 2*pi if it falls below 0.
+IF (WD > 2 * pi) THEN WD = WD - 2 * pi|Adjusts the wind direction to be within the range of 0 to 2*pi if it exceeds 2*pi.
+SWC = (WS / TAS) * sin(WD - CRS)|Calculates the sine of the wind correction angle for determining heading.
+"IF (abs(SWC) > 1) ""course cannot be flown-- wind too strong"""|Checks if the wind correction angle is too large to fly the course.
+HD = CRS + asin(SWC)|Calculates the heading required to maintain the desired course considering the wind.
+IF (HD < 0) HD = HD + 2 * pi|Adjusts the heading to be within the range of 0 to 2*pi if it falls below 0.
+IF (HD > 2 * pi) HD = HD - 2 * pi|Adjusts the heading to be within the range of 0 to 2*pi if it exceeds 2*pi.
+GS = TAS * sqrt(1 - SWC^2) - WS * cos(WD - CRS)|Calculates the groundspeed considering the wind speed and direction.
+GS = sqrt(WS^2 + TAS^2 - 2 * WS * TAS * cos(HD - WD))|Calculates the groundspeed given the true airspeed, wind speed, heading, and wind direction.
+WCA = atan2(WS * sin(HD - WD), TAS - WS * cos(HD - WD))|Calculates the wind correction angle using the atan2 function.
+CRS = MOD(HD + WCA, 2 * pi)|Calculates the course considering the wind correction angle.
+WCA = asin((WS / GS) * sin(HD - WD))|Calculates the wind correction angle assuming the wind correction angle is less than 90 degrees.
+HW = WS * cos(WD - RD)|Calculates the headwind component where a tailwind is considered negative.
+XW = WS * sin(WD - RD)|Calculates the crosswind component where positive values indicate wind from the right.
+WD = WD_in_degrees * (pi / 180)|Converts wind direction from degrees to radians.
+RD = RD_in_degrees * (pi / 180)|Converts runway direction from degrees to radians.
+vms = (v1^2 + v2^2 + v3^2) / 3|Calculates the mean squared groundspeed from three measured groundspeeds.
+a1 = v1^2 / vms - 1|Computes the relative difference for the first groundspeed compared to the mean squared groundspeed.
+a2 = v2^2 / vms - 1|Computes the relative difference for the second groundspeed compared to the mean squared groundspeed.
+a3 = v3^2 / vms - 1|Computes the relative difference for the third groundspeed compared to the mean squared groundspeed.
+mu = (a1^2 + a2^2 + a3^2) / 6|Calculates the mean of the squares of the relative differences.
+bp = 1/2 + sqrt(1/4 - mu)|Finds the positive root of the quadratic equation b^2 - b + mu = 0.
+bm = mu / bp|Calculates the other root using the value of the positive root bp.
+TAS = sqrt(vms * bp)|Calculates the true airspeed assuming it exceeds the windspeed.
+Windspeed = sqrt(vms * bm)|Calculates the windspeed assuming the true airspeed exceeds the windspeed.
+IF TAS < Windspeed|Exchange the roots if the true airspeed is less than the windspeed.
+var = -65.6811 + 0.99 * x + 0.0128899 * x^2 - 0.0000905928 * x^3 + 2.87622 * y - 0.0116268 * x * y - 0.00000603925 * x^2 * y - 0.0389806 * y^2 - 0.0000403488 * x * y^2 + 0.000168556 * y^3|Polynomial fit formula to estimate magnetic variation for the continental US where x is latitude (N) and y is longitude (W).
+var = 618.854 + 2.76049 * x - 0.556206 * x^2 + 0.00251582 * x^3 - 12.7974 * y + 0.408161 * x * y + 0.000434097 * x^2 * y - 0.00602173 * y^2 - 0.00144712 * x * y^2 + 0.000222521 * y^3|Polynomial fit formula to estimate magnetic variation for Alaska where x is latitude (N) and y is longitude (W).
+var = 10.4768771667158 - 0.507385322418858 * lon + 0.00753170031703826 * lon^2 - 1.40596203924748e-05 * lon^3 - 0.535560699962353 * lat + 0.0154348808069955 * lat * lon - 8.07756425110592e-05 * lat * lon^2 + 0.00976887198864442 * lat^2 - 0.000259163929798334 * lat^2 * lon - 3.69056939266123e-05 * lat^3|Polynomial fit formula to estimate magnetic variation for Western Europe where lon is longitude (E) and lat is latitude (N).
+T_s = T_0 - T_r * h|Calculates the standard temperature at altitude h (h < h_Tr).
+T_s = T_Tr|Standard temperature above the tropopause up to 20 km altitude.
+T_s = 15 - 0.0019812 * h|Calculates the standard temperature at altitude h in feet (h < 36089.24 ft).
+p = P_0 * (1 - 6.8755856e-6 * h)^5.2558797|Calculates the pressure at altitude h below the tropopause (h < 36089.24 ft).
+p_Tr = 0.2233609 * P_0|Calculates the pressure at the tropopause.
+p = p_Tr * exp(-4.806346e-5 * (h - 36089.24))|Calculates the pressure above the tropopause (h > 36089.24 ft).
+rho = rho_0 * (1 - 6.8755856e-6 * h)^4.2558797|Calculates the air density at altitude h below the tropopause (h < 36089.24 ft).
+rho_Tr = 0.2970756 * rho_0|Calculates the air density at the tropopause.
+rho = rho_Tr * exp(-4.806346e-5 * (h - 36089.24))|Calculates the air density above the tropopause (h > 36089.24 ft).
+P_alt_corr = 145442.2 * (1 - (alt_set / 29.92126)^0.190261)|Calculates the pressure altitude correction in feet using the altimeter setting.
+P_alt_corr = (29.92 - alt_set) * 1000|Simple approximation for pressure altitude correction.
+P_alt = Ind_Alt + P_alt_corr|Calculates the pressure altitude using the indicated altitude and the pressure altitude correction.
+D_Alt = P_alt + (T_s / T_r) * (1 - (T_s / T)^0.2349690)|Calculates the density altitude using the pressure altitude and the ratio of standard to actual temperature.
+D_Alt = P_Alt + 118.6 * (T - T_s)|Approximate formula for density altitude where T and T_s may be in Celsius or Kelvin.
+TA = CA + (CA - FE) * (ISADEV) / (273 + OAT)|Calculates the true altitude above sea-level using the calibrated altitude, field elevation, average deviation from standard temperature, and outside air temperature.
+Mach Number (M) = TAS / CS|Calculates the Mach number as the ratio of true airspeed to the speed of sound.
+CS = 38.967854 * sqrt(T + 273.15)|Calculates the speed of sound (CS) in knots given the outside air temperature (T) in Celsius.
+IAT = OAT + K * TAS^2 / 7592|Estimates the indicated air temperature (IAT) considering the effect of compressibility on the true air temperature (OAT).
+OAT = (IAT + 273.15) / (1 + 0.2 * K * M^2) - 273.15|Calculates the outside air temperature (OAT) using the indicated air temperature (IAT) and Mach number (M).
+TAS = CAS * (rho_0 / rho)^0.5|Calculates the true airspeed (TAS) using the calibrated airspeed (CAS) and the ratio of sea-level density to the air density at altitude.
+TAS = CAS / (1 - 6.8755856e-6 * DA)^2.127940|Simplified formula to calculate true airspeed (TAS) from calibrated airspeed (CAS) and density altitude (DA < 36089.24 ft).
+DP = P_0 * ((1 + 0.2 * (IAS / CS_0)^2)^3.5 - 1)|Calculates the differential pressure (DP) using the indicated airspeed (IAS) and speed of sound at sea level (CS_0).
+M = sqrt(5 * ((DP / P + 1)^(2/7) - 1))|Calculates the Mach number from differential pressure (DP) and pressure at altitude (P).
+TAS = M * CS|Calculates the true airspeed (TAS) using the Mach number (M) and the speed of sound (CS).
+M = 0.881285 * sqrt((DP / P + 1) * (1 - 1 / (7 * M^2))^(5/2))|Iteratively refines the Mach number (M) for supersonic flight using Rayleigh's Supersonic Pitot equation.
+P = P_0 * (1 - 6.8755856e-6 * PA)^5.2558797|Calculates the pressure at a given pressure altitude (PA) below the tropopause.
+CS_0 = 38.967854 * sqrt(15 + 273.15)|Calculates the speed of sound at sea level (CS_0).
+x = (1 - 6.8755856e-6 * PA)^5.2558797|Intermediate variable for finding indicated airspeed (IAS) given Mach number (M) and pressure altitude (PA).
+ias = 661.4786 * sqrt(5 * ((1 + x * ((1 + M^2 / 5)^3.5 - 1))^(2/7) - 1))|Calculates the indicated airspeed (IAS) from the Mach number (M) and pressure altitude (PA) for subsonic speeds (M <= 1).
+f = exp(17.27 * (Td / (Td + 237.3) - T / (T + 237.3)))|Calculates the relative humidity (f) as a fraction using the temperature (T) and dewpoint (Td) in Celsius.
+f = exp(21.87 * (Tf / (Tf + 265.5) - T / (T + 265.5)))|Calculates the relative humidity (f) as a fraction using the temperature (T) and frostpoint (Tf) in Celsius.
+e_s = 6.11 * exp(b * T / (T + a))|Calculates the saturation vapor pressure (e_s) over water or ice using constants a and b.
+Dewpoint (Td) = 237.3 / (1 / (ln(f) / 17.27 + T / (T + 237.3)) - 1)|Finds the dewpoint temperature in Celsius from the relative humidity (f) and temperature (T).
+Frostpoint (Tf) = 265.5 / (1 / (ln(f) / 21.87 + T / (T + 265.5)) - 1)|Finds the frostpoint temperature in Celsius from the relative humidity (f) and temperature (T).
+ed = 6.11 * exp(17.27 * T / (T + 237.3))|Calculates the saturation vapor pressure at the dry-bulb temperature (T) in Celsius.
+ew = 6.11 * exp(17.27 * Tw / (Tw + 237.3))|Calculates the saturation vapor pressure at the wet-bulb temperature (Tw) in Celsius.
+wd = 0.62197 * ed / (p - ed)|Computes the saturation mixing ratio at the dry-bulb temperature (T).
+ww = 0.62197 * ew / (p - ew)|Computes the saturation mixing ratio at the wet-bulb temperature (Tw).
+w = (2500.0 * ww - 1.0046 * (T - Tw)) / (2500.0 + 1.81 * (T - Tw))|Calculates the mixing ratio using the dry-bulb and wet-bulb temperatures.
+f = w / wd|Determines the relative humidity as a fraction.
+e = p * w / (0.62197 + w)|Calculates the vapor pressure (e) in millibars.
+Td = (237.3 * log10(e) - 186.527) / (8.286 - log10(e))|Finds the dewpoint temperature (Td) in Celsius from the vapor pressure (e).
+Increase(ft) = 0.267 * RH * (T + 273) * exp(17.3 * T / (T + 237)) * (1 - 0.00000688 * H)^(-5.26)|Calculates the increase in effective density altitude due to humidity using the temperature (T) in Celsius and pressure altitude (H) in feet.
+Increase(ft) = 0.267 * (T + 273) * exp(17.3 * Td / (Td + 237)) * (1 - 0.00000688 * H)^(-5.26)|Calculates the increase in effective density altitude using the dewpoint (Td) in Celsius and pressure altitude (H) in feet.
+Drift (nm) = 21500 * (p2 - p1) / (sin(latitude) * TAS)|Calculates the wind drift in nautical miles using the pressure difference in inches, average latitude, and true airspeed.
+Drift (nm) = 635 * (p2 - p1) / (sin(latitude) * TAS)|Calculates the wind drift in nautical miles using the pressure difference in millibars, average latitude, and true airspeed.
+Wind Correction Angle = 1230000 * (p2 - p1) / (sin(latitude) * TAS * Dist)|Calculates the wind correction angle in degrees using the pressure difference in inches, average latitude, true airspeed, and distance.
+Wind Correction Angle = 36300 * (p2 - p1) / (sin(latitude) * TAS * Dist)|Calculates the wind correction angle in degrees using the pressure difference in millibars, average latitude, true airspeed, and distance.
+1 knot = 1.852 km/hr|Converts knots to kilometers per hour.
+1 knot = 1.687810 ft/sec|Converts knots to feet per second.
+1 knot = 1.150779 mph|Converts knots to miles per hour.
+1 mph = 0.868976 knot|Converts miles per hour to knots.
+1 mph = 1.609344 km/hr|Converts miles per hour to kilometers per hour.
+1 mph = 1.466667 ft/sec|Converts miles per hour to feet per second.
+1 km/hr = 0.539968 knot|Converts kilometers per hour to knots.
+1 km/hr = 0.911344 ft/sec|Converts kilometers per hour to feet per second.
+1 km/hr = 0.621371 mph|Converts kilometers per hour to miles per hour.
+WGS84, Major axis a = 6378.13700 km, Flattening f = 1/298.257223563|Describes the WGS84 ellipsoid parameters.
+GRS80/NAD83, Major axis a = 6378.13700 km, Flattening f = 1/298.257222101|Describes the GRS80/NAD83 ellipsoid parameters.
+WGS66, Major axis a = 6378.145 km, Flattening f = 1/298.25|Describes the WGS66 ellipsoid parameters.
+GRS67/IAU68, Major axis a = 6378.16000 km, Flattening f = 1/298.2472|Describes the GRS67/IAU68 ellipsoid parameters.
+WGS72, Major axis a = 6378.135 km, Flattening f = 1/298.26|Describes the WGS72 ellipsoid parameters.
+Krasovsky, Major axis a = 6378.245 km, Flattening f = 1/298.3|Describes the Krasovsky ellipsoid parameters.
+Clarke66/NAD27, Major axis a = 6378.2064 km, Flattening f = 1/294.9786982138|Describes the Clarke66/NAD27 ellipsoid parameters.
+tan(u) = tan(v) * (h * sqrt((a * cos(v))^2 + (b * sin(v))^2) + b^2) / (h * sqrt((a * cos(v))^2 + (b * sin(v))^2) + a^2)|Converts geodetic latitude (v) and height (h) to geocentric latitude (u).
+r^2 = h^2 + 2 * h * sqrt((a * cos(v))^2 + (b * sin(v))^2) + (a^4 - (a^4 - b^4) * (sin(v))^2) / (a^2 - (a^2 - b^2) * (sin(v))^2)|Calculates the geocentric radius (r) using geodetic latitude (v) and height (h).
+tan(b) = v^2 / (R * g)|Calculates the bank angle (b) in radians for a given airspeed (v) and turn radius (R).
+v = w * R|Relates airspeed (v) to the turn radius (R) and rate of turn (w).
+h_p = v^2 / g|Calculates the pivotal altitude (h_p) for a given airspeed (v) and gravitational acceleration (g).
+R = v^2 / (11.23 * tan(0.01745 * b))|Calculates the radius of turn (R) in feet given airspeed (v) in knots and bank angle (b) in degrees.
+w = 96.7 * v / R|Calculates the rate of turn (w) in degrees per second given airspeed (v) and radius of turn (R).
+b_s = 57.3 * atan(v / 362.1)|Calculates the bank angle (b_s) for a standard rate turn given airspeed (v) in knots.
+b_s ≈ v / 7|Provides a rule-of-thumb for estimating the bank angle (b_s) for a standard rate turn for speeds less than 250 knots.
+h_p = v^2 / 11.23|Calculates the pivotal altitude (h_p) in feet for a given airspeed (v) in knots.
+d = sqrt(2 * R * h / b)|Calculates the distance to the horizon (d) given the height (h) above the ground and the Earth's radius (R), adjusted for atmospheric refraction factor (b).
+b = 0.8279|Atmospheric refraction factor that accounts for the standard temperature lapse rate.
+d = 1.17 * sqrt(h)|Simplified formula for calculating the distance to the horizon (d) in nautical miles (nm) given the height (h) in feet.
+bearing = atan2(sin(Δλ) * cos(lat2), cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(Δλ))|Calculates the initial bearing from point p1 to point p2.
+offset_bearing_right = bearing + 90|Calculates the offset bearing to the right of the route.
+offset_bearing_left = bearing - 90|Calculates the offset bearing to the left of the route.
+lat3 = asin(sin(lat1) * cos(n/R) + cos(lat1) * sin(n/R) * cos(offset_bearing))|Calculates the latitude of the new point p3 offset by distance n to the left or right of the original route.
+lon3 = lon1 + atan2(sin(offset_bearing) * sin(n/R) * cos(lat1), cos(n/R) - sin(lat1) * sin(lat3))|Calculates the longitude of the new point p3 offset by distance n to the left or right of the original route.
+lat4, lon4, Repeat the calculations for point p4 using point p2 as the reference|Calculates the latitude and longitude of the new point p4 offset by distance n to the left or right of the original route.
+Fuel_Consumption = Total_Fuel / Flight_Time|Calculates the fuel consumption for a given route by dividing the total fuel by the flight time.
+Range = TAS * Total_Fuel / Fuel_Flow|Calculates the range of the aircraft using the true airspeed (TAS) and fuel consumption rate.
+Endurance = Total_Fuel / Fuel_Flow|Calculates the endurance of the aircraft based on the available fuel and fuel flow rate.
+Critical_Point = (2 * Distance_to_Destination * Ground_Speed_Back) / (Ground_Speed_Forward + Ground_Speed_Back)|Determines the critical point where the aircraft can either continue to the destination or return to the origin.
+Takeoff_Distance = (1.2 * V_R^2) / (2 * g * (Thrust - Drag - Rolling_Resistance))|Calculates the takeoff distance considering thrust, drag, and rolling resistance.
+Landing_Distance = (V_Ref^2) / (2 * g * (Deceleration))|Calculates the landing distance using the reference speed and deceleration.
+Rate_of_Climb = (Excess_Power) / (Weight)|Determines the rate of climb using the excess power and aircraft weight.
+Rate_of_Descent = (Thrust - Drag) / Weight|Calculates the rate of descent considering thrust and drag.
+V_Speeds = [V1, VR, V2, Vx, Vy, Vne, etc.]|Computes and determines key operational speeds for flight safety.
+Magnetic_Deviation = True_Course - Magnetic_Course|Calculates the magnetic deviation between the true course and magnetic course.
+Point_of_No_Return = (Ground_Speed_Forward * Total_Fuel) / (Ground_Speed_Back + Ground_Speed_Forward)|Determines the point beyond which returning to the origin is not possible.
+Direct_Route = acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1)) * R|Calculates the direct route distance between two points.
+Center_of_Gravity = (Sum_of_Moments) / (Total_Weight)|Calculates the aircraft's center of gravity based on the sum of moments and total weight.
+Stability_Check = (CG - CG_Limits)|Checks the center of gravity position relative to the allowable limits for stability.
+Wind_Shear = Change_in_Wind_Speed / Change_in_Altitude|Calculates wind shear based on the change in wind speed relative to change in altitude.
+Icing_Risk = (Temperature < 0) and (Relative_Humidity > 0.7)|Determines the risk of icing based on temperature and relative humidity.
+Turbulence_Index = sqrt((dV/dt)^2 + (dOmega/dt)^2)|Computes the turbulence index using changes in speed and angular rate.
+VOR_Range = 1.23 * sqrt(Altitude)|Calculates the range of the VOR station based on the aircraft's altitude.
+DME_Distance = sqrt((Aircraft_Altitude)^2 + (Horizontal_Distance)^2)|Calculates the DME distance using aircraft altitude and horizontal distance.
+Radio_Wave_Propagation = Speed_of_Light / Frequency|Calculates the propagation of radio waves based on the speed of light and frequency.
+Lift_Force = 0.5 * rho * v^2 * S * CL|Calculates the lift force based on air density, velocity, wing area, and lift coefficient.
+Thrust_Force = (Mass_Flow_Rate * Exhaust_Velocity) - (Mass_Flow_Rate * Air_Inlet_Velocity)|Computes the thrust force based on mass flow rate and exhaust velocity.
+Drag_Force = 0.5 * rho * v^2 * S * CD|Calculates the drag force using air density, velocity, wing area, and drag coefficient.
+Turn_Radius = v^2 / (g * tan(bank_angle))|Calculates the turn radius during a maneuver.
+Standard_Rate_Turn = 3 * TAS / 3600|Computes the standard rate turn given the true airspeed.
+Pitch_Angle = asin((Lift - Weight) / (Thrust))|Determines the pitch angle during a maneuver.
+Altimeter_Error_Correction = Indicated_Altitude - True_Altitude|Calculates the altimeter error correction using indicated and true altitudes.
+Nonlinear_Altimeter_Model = h = (P0/P)^(1/5.257) - 1|Uses nonlinear models to calculate the actual altitude.
+GPS_Position = [Latitude, Longitude, Altitude]|Computes the aircraft's position using GPS systems.
+Great_Circle_Distance = R * acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1))|Calculates the optimal distance between two points using great circle routes.
+Initial_Bearing = atan2(sin(Δlon) * cos(lat2), cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(Δlon))|Calculates the initial bearing from the aircraft's current position to the DME station.
+Distance_to_Station = sqrt((lat2 - lat1)^2 + (cos((lat1 + lat2) / 2) * (lon2 - lon1))^2) * R|Calculates the distance from the aircraft to the DME station using the Haversine formula.
+New_Heading = Initial_Bearing + 90 (or -90 for left turns)|Adjusts the aircraft's heading to intercept and fly along the DME arc to the right or left of the station.
+Next_Waypoint_Lat = lat1 + (DME_Distance/R) * cos(New_Heading)|Calculates the latitude of the next waypoint on the DME arc.
+Next_Waypoint_Lon = lon1 + (DME_Distance/R) * sin(New_Heading) / cos(lat1)|Calculates the longitude of the next waypoint on the DME arc.
