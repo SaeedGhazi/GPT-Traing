@@ -1,0 +1,41 @@
+pdf_path,book_name,doc_number,organization,revision_date,edition
+pdfs/10066_cons_en.pdf,Aeronautical Information Management,Document 10066,ICAO,2018,1
+pdfs/4444 PANS ATM.pdf,Air Traffic Management,Document 4444,ICAO,2016,16
+pdfs/8168_v1_cons_en.pdf,Aircraft Operations - Flight Procedures,Document 8168 Volume 1,ICAO,2018,6
+pdfs/8168_v2_cons_en.pdf,Aircraft Operations - Construction of Visual and Instrument Flight Procedures,Document 8168 Volume 2,ICAO,2020,7
+pdfs/8168_v3_cons_en.pdf,Aircraft Operations - Aircraft Operating Procedures,Document 8168 Volume 3,ICAO,2018,1
+pdfs/8400_cons_en.pdf,ICAO Abbreviations and Codes,Document 8400,ICAO,2016,9
+pdfs/9868_cons_en.pdf,Training,Document 9868,ICAO,2020,3
+pdfs/9981_cons_en.pdf,Aerodromes,Document 9981,ICAO,2020,3
+pdfs/AN01_cons.pdf,Personnel Licensing,Annex 1,ICAO,2022,14
+pdfs/an02_cons.pdf,Rules of the Air,Annex 2,ICAO,8/11/2018,10
+pdfs/an03_cons.pdf,Meteorological Service for International Air Navigation,Annex 3,ICAO,4/11/2021,20
+pdfs/an04_cons.pdf,Aeronautical Charts,Annex 4,ICAO,4/11/2021,11
+pdfs/an05_cons.pdf,Units of Measurement to be Used in Air and Ground Operations,Annex 5,ICAO,2010,5
+pdfs/AN06_P1_cons.pdf,Operation of Aircraft - International Commercial Air Transport – Aeroplanes,Annex 6 Part 1,ICAO,2022,12
+pdfs/an06_p2_cons.pdf,Operation of Aircraft - International General Aviation - Aeroplanes,Annex 6 Part 2,ICAO,2022,11
+pdfs/an06_p3_cons.pdf,Operation of Aircraft - International Operations - Helicopters,Annex 6 Part 3,ICAO,2022,11
+pdfs/an07_cons.pdf,Aircraft Nationality and Registration Marks,Annex 7,ICAO,2/11/2023,6
+pdfs/an08_cons.pdf,Airworthiness of Aircraft,Annex 8,ICAO,2022,13
+pdfs/an09_cons.pdf,Facilitation,Annex 9,ICAO,2022,16
+pdfs/AN10_V1_cons.pdf,Aeronautical Telecommunications - Radio Navigation Aids,Annex 10 Volume 1,ICAO,2023,8
+pdfs/AN10_V2_cons.pdf,Aeronautical Telecommunications – Communication Procedures including those with PANS status,Annex 10 Volume 2,ICAO,5/112020,7
+pdfs/AN10_V3_cons.pdf,Aeronautical Telecommunications - Communication Systems,Annex 10 Volume 3,ICAO,3/11/2022,2
+pdfs/an10_v4_cons.pdf,Aeronautical Telecommunications - Surveillance and Collision Avoidance Systems,Annex 10 Volume 4,ICAO,3/11/2021,5
+pdfs/AN10_V5_cons.pdf,Aeronautical Telecommunications - Aeronautical Radio Frequency & Spectrum Utilization,Annex 10 Volume 5,ICAO,2013,3
+pdfs/an11_cons.pdf,Air Traffic Services,Annex 11,ICAO,5/11/2020,15
+pdfs/an12_cons.pdf,Search and Rescue,Annex 12,ICAO,22/11/2007,8
+pdfs/AN13_cons.pdf,Aircraft Accident and Incident Investigation,Annex 13,ICAO,2020,12
+pdfs/an14_v1_cons.pdf,Aerodromes - Aerodrome Design and Operations,Annex 14 Volume 1,ICAO,2022,9
+pdfs/AN14_V2_cons.pdf,Aerodromes – Heliports,Annex 14 Volume 2,ICAO,2022,5
+pdfs/an15_cons.pdf,Aeronautical Information Services,Annex 15,ICAO,4/11/2022,16
+pdfs/AN16_V1_cons.pdf,Environmental Protection - Aircraft Noise,Annex 16 Volume 1,ICAO,2017,8
+pdfs/AN16_V2_cons.pdf,Environmental Protection - Aircraft Engine Emissions,Annex 16 Volume 2,ICAO,2023,5
+pdfs/AN16_V3_cons.pdf,Environmental Protection - Aeroplane CO2 Emissions,Annex 16 Volume 3,ICAO,2017,1
+pdfs/AN16_V4_cons_en.pdf,Environmental Protection – Carbon Offsetting and Reduction Scheme for International Aviation (CORSIA),Annex 16 Volume 4,ICAO,2023,2
+pdfs/an17_cons.pdf,Aviation Security,Annex 17,ICAO,2022,12
+pdfs/AN18_cons.pdf,The Safe Transport of Dangerous Goods by Air,Annex 18,ICAO,12/11/2015,4
+pdfs/an19_cons.pdf,Safety Management,Annex 19,ICAO,2016,2
+pdfs/IRAN_Civil_Aviation_Organization_SIRA.pdf,Standardized Iranian Rules of the Air,SIRA,IRI.CAO,2022,1
+pdfs/Manual_of_Air_Traffic_Services_APR_2022.pdf,Manual of Air Traffic Services,MATS,IRI.CAO,2022,1
+pdfs/OIII_Local_ATC_Instructions_1403-05-27.pdf,Mehrabad Intl Airport Local Air Traffic Control Instructions,LATCI,IRI.IAC,01/03/2023,1
