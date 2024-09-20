@@ -1,0 +1,125 @@
+To ensure you correctly interpret and process our Markdown file (ICAO_Pans_Annexes.md), please familiarize yourself with the following formatting logic and conventions we've used:
+
+1. **Book Separation:**
+   - **Books are separated by a horizontal rule** consisting of three dashes `---` on its own line.
+   - This separator indicates that the content following it belongs to a new book.
+   - **Example:**
+     ```
+     [Content of Book 1]
+
+     ---
+
+     [Content of Book 2]
+     ```
+
+2. **Metadata Section:**
+   - Each book begins with metadata that provides key information.
+   - **Book Name:** Presented as a Level 1 heading using a single `#`. For example:
+     ```
+     # Book Name
+     ```
+   - **Metadata Fields:** Listed below the book name, each on its own line, formatted in bold using double asterisks `**`:
+     - **Document Number:** Unique identifier for the document.
+     - **Organization:** Name of the issuing organization.
+     - **Revision Date:** Date of the latest revision (e.g., "2023-10-15").
+     - **Edition:** Edition of the document.
+     - **Example:**
+       ```
+       **Document Number:** 12345
+
+       **Organization:** Example Organization
+
+       **Revision Date:** 2023-10-15
+
+       **Edition:** Second Edition
+       ```
+
+3. **Heading Structure:**
+   - We use Markdown heading levels to represent the hierarchical structure of the document.
+   - The number of `#` symbols corresponds to the depth of the section:
+     - `#` for Level 1 headings (e.g., chapters).
+     - `##` for Level 2 headings.
+     - `###` for Level 3 headings, and so on, up to `######` for Level 6.
+   - **Numeric Headings:** For headings with numbered sections like "5.2.1.1.3", we count the number of numeric segments to determine the heading level:
+     - **Example:**
+       ```
+       ## 5.2
+       ### 5.2.1
+       #### 5.2.1.1
+       ##### 5.2.1.1.3
+       ```
+
+4. **Table of Contents:**
+   - Included as a Level 2 heading using `##`:
+     ```
+     ## Table of Contents
+     ```
+   - Lists major sections or chapters as bullet points.
+
+5. **Definitions and Abbreviations Section:**
+   - Typically located in **Chapter 1**, after the **Foreword**.
+   - **Formatting of Terms:**
+     - **Bold term(s)** ending with a dot (`.`). These are the terms being defined.
+     - The **definition text** follows the term and continues until the next bold term appears.
+     - **Example:**
+       ```
+       **Term.** The definition of the term goes here and may span multiple lines or paragraphs until the next term is introduced.
+
+       **Another Term.** The definition of the next term.
+       ```
+   - **Abbreviations** are formatted similarly.
+
+6. **Paragraphs and Sentences:**
+   - Regular text is written in paragraphs.
+   - Sentences within paragraphs are separated by single spaces unless they are meant to start a new paragraph.
+
+7. **Tables:**
+   - Extracted tables are converted into Markdown table format.
+   - Inserted into the content following the headings or sections they belong to.
+
+8. **Headers and Footers:**
+   - Headers and footers from the original PDF (like page numbers or repeated section titles) are intentionally omitted to maintain content clarity.
+
+9. **Special Text Handling:**
+   - **Bold Text:** Used for terms and headings as specified.
+   - **Italics and Underlines:** Not commonly used unless they appear in the original document with specific significance.
+
+By understanding and applying these conventions—including recognizing the `---` separator between books—you will be able to accurately process the combined Markdown file, preserving the intended structure, hierarchy, and metadata of the original documents.
+
+---
+
+**Additional Note on Processing Multiple Books:**
+
+- When processing the Markdown file, treat the content between each `---` separator as a distinct book.
+- Ensure that metadata and content are associated correctly with each book.
+- **Example of Multiple Books in Markdown:**
+
+  ```
+  # Book Name 1
+
+  **Document Number:** 12345
+
+  **Organization:** Organization A
+
+  **Revision Date:** 2023-10-15
+
+  **Edition:** First Edition
+
+  [Content of Book 1]
+
+  ---
+
+  # Book Name 2
+
+  **Document Number:** 67890
+
+  **Organization:** Organization B
+
+  **Revision Date:** 2023-11-01
+
+  **Edition:** Second Edition
+
+  [Content of Book 2]
+  ```
+
+By incorporating this convention into your processing logic, you can correctly identify where one book ends and another begins, ensuring that metadata and content are accurately parsed and associated.

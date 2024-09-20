@@ -15,7 +15,7 @@ nltk.download('punkt', quiet=True)
 def extract_text_with_layout(pdf_path):
     content = []
     current_paragraph = ''
-    prev_size = None
+    prev_size = None  # Initialize previous font size
     in_toc = False  # Flag to indicate we're in the TOC section
     toc_entries = []
 
@@ -53,8 +53,8 @@ def extract_text_with_layout(pdf_path):
                         font_sizes = [char.size for char in text_line if isinstance(char, LTChar)]
                         avg_font_size = sum(font_sizes) / len(font_sizes) if font_sizes else 0
 
-                        # Determine heading level based on text patterns
-                        heading_level = determine_heading_level(text)
+                        # Determine heading level based on text patterns and font size
+                        heading_level = determine_heading_level(text_line, avg_font_size, prev_size)
                         if heading_level:
                             # Save current paragraph
                             if current_paragraph:
@@ -80,7 +80,7 @@ def extract_text_with_layout(pdf_path):
                         else:
                             current_paragraph = text
 
-                        prev_size = avg_font_size
+                        prev_size = avg_font_size  # Update previous font size
 
                     elif isinstance(text_line, LTChar):
                         # Handle LTChar instances separately
@@ -94,6 +94,8 @@ def extract_text_with_layout(pdf_path):
                         # Process the text as needed
                         # For simplicity, we'll treat it as a paragraph
                         current_paragraph += text
+
+                        prev_size = avg_font_size  # Update previous font size
 
                     else:
                         # Skip other types
@@ -124,25 +126,68 @@ def is_header_or_footer(text):
         return True
     return False
 
-def determine_heading_level(text):
-    text = text.strip()
+def determine_heading_level(text_line, avg_font_size, prev_font_size):
+    # Extract the text from the text_line
+    if isinstance(text_line, LTTextLine):
+        text = text_line.get_text().strip()
+    elif isinstance(text_line, str):
+        text = text_line.strip()
+    else:
+        return None
+
     # Check for 'Chapter' heading
     if re.match(r'^Chapter\s+\d+', text, re.IGNORECASE):
         return '#'  # Level 1 heading
+
     # Check for all caps headings (likely top-level headings)
     elif re.match(r'^[A-Z ]+$', text) and len(text.split()) < 10:
         return '#'  # Level 1 heading
+
     else:
-        # Match numeric headings like '5.2.1.1.3'
-        match = re.match(r'^(\d+\.)+\d+', text)
+        # Match numeric headings like '4.3.2' at the beginning of the text
+        match = re.match(r'^((\d+\.)+\d+)', text)
         if match:
-            segments = text.strip().split('.')
+            heading_number = match.group(1)  # The matched heading number
+            segments = heading_number.split('.')
             level = len(segments)
             if level > 6:
                 level = 6  # Limit to maximum 6 levels
             return '#' * level
-        else:
-            return None  # Not a heading
+
+    # Compare font size to detect headings
+    if avg_font_size and prev_font_size:
+        if avg_font_size > prev_font_size * 1.2:
+            # If current font size is significantly larger than previous, it might be a heading
+            level = determine_level_by_font_size(avg_font_size)
+            return '#' * level
+
+    # Check for bold text
+    if is_bold_text(text_line):
+        return '##'  # Assign Level 2 heading as an example
+
+    return None  # Not a heading
+
+def determine_level_by_font_size(font_size):
+    # You may need to adjust these thresholds based on your PDFs
+    if font_size >= 20:
+        return 1  # Level 1 heading
+    elif font_size >= 18:
+        return 2  # Level 2 heading
+    elif font_size >= 16:
+        return 3  # Level 3 heading
+    elif font_size >= 14:
+        return 4  # Level 4 heading
+    elif font_size >= 12:
+        return 5  # Level 5 heading
+    else:
+        return 6  # Level 6 heading
+
+def is_bold_text(text_line):
+    if isinstance(text_line, LTTextLine):
+        for char in text_line:
+            if isinstance(char, LTChar) and 'Bold' in char.fontname:
+                return True
+    return False
 
 def should_join_lines(prev_line, current_line):
     if prev_line.endswith('-'):
@@ -213,13 +258,13 @@ def combine_content(content_list, toc_entries, markdown_tables, metadata):
 
 def extract_existing_books(markdown_content):
     pattern = (
-        r'^#\s+(.*?)\n\n'
-        r'\*\*Document Number:\*\*\s*(.*?)\n\n'
-        r'\*\*Organization:\*\*\s*(.*?)\n\n'
-        r'\*\*Revision Date:\*\*\s*(.*?)\n\n'
-        r'\*\*Edition:\*\*\s*(.*?)\n\n'
+        r'^#\s+(.*?)\n+'
+        r'\*\*Document Number:\*\*\s*(.*?)\n+'
+        r'\*\*Organization:\*\*\s*(.*?)\n+'
+        r'\*\*Revision Date:\*\*\s*(.*?)\n+'
+        r'\*\*Edition:\*\*\s*(.*?)\n+'
     )
-    matches = re.findall(pattern, markdown_content, flags=re.MULTILINE | re.DOTALL | re.IGNORECASE)
+    matches = re.findall(pattern, markdown_content, flags=re.MULTILINE | re.IGNORECASE)
     existing_books = []
     for match in matches:
         book_name = match[0].strip()
