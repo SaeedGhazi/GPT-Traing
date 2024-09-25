@@ -51,7 +51,7 @@ def extract_main_content(page_content):
                 else:
                     extracted_texts.append(f"[Reply]\n" + "\n".join(filtered_lines))
 
-    return '\n'.join(extracted_texts)
+    return '\n'.join(extracted_texts), posts  # Return both extracted text and the posts
 
 # Function to process the forum pages
 def download_forum_topics():
@@ -64,7 +64,7 @@ def download_forum_topics():
         t = last_t if f == last_f else 1  # Start `t` from last_t for the first `f`
         
         with open(output_file, 'a', encoding='utf-8') as file:
-            while consecutive_not_found < 2:  # Stop if we get 2 consecutive "not found"
+            while consecutive_not_found < 50:  # Stop if we get 50 consecutive "not found"
                 url = base_url.format(f, t)
                 
                 if url in visited_urls:
@@ -78,14 +78,17 @@ def download_forum_topics():
                         # Check for "The requested topic does not exist."
                         if "The requested topic does not exist." in response.text:
                             consecutive_not_found += 1
-                            print(f'Topic not found at {url}, increasing counter to {consecutive_not_found}')
+                            print(f'Topic not found at {url} (status 200), increasing counter to {consecutive_not_found}')
                             t += 1
+                            if consecutive_not_found >= 50:
+                                print(f'Maximum consecutive "not found" reached. Moving to next f.')
+                                break  # Move to the next `f` and reset `t`
                             continue
                         else:
                             consecutive_not_found = 0  # Reset counter on a valid page
                             
                             # Extract the main question and replies
-                            main_content = extract_main_content(response.text)
+                            main_content, posts = extract_main_content(response.text)
                             
                             if main_content:  # Only save if there is content
                                 # Write the URL and main content to the output file
@@ -97,10 +100,34 @@ def download_forum_topics():
                                     log.write(url + '\n')
                                     
                                 visited_urls.add(url)
+                    elif response.status_code == 404:
+                        # Check if the content contains "No posts found"
+                        if "No posts found" in response.text:
+                            consecutive_not_found += 1
+                            print(f'No posts found at {url} (status 404), increasing counter to {consecutive_not_found}')
+                            t += 1
+                            if consecutive_not_found >= 50:
+                                print(f'Maximum consecutive "not found" reached. Moving to next f.')
+                                break  # Move to the next `f` and reset `t`
+                            continue
+                        else:
+                            print(f'Unexpected content at {url} with status code 404, but not "No posts found".')
+                            consecutive_not_found += 1  # Increment counter even if content is unexpected
+                            t += 1
+                            if consecutive_not_found >= 50:
+                                print(f'Maximum consecutive "not found" reached. Moving to next f.')
+                                break  # Move to the next `f` and reset `t`
+                            continue
                     else:
+                        # Other non-200/404 status codes, we can just ignore and continue
                         print(f'Failed to access {url} with status code {response.status_code}')
+                        t += 1
+                        continue
+
                 except Exception as e:
                     print(f'Error accessing {url}: {e}')
+                    t += 1
+                    continue
                 
                 # Increase t to check the next topic
                 t += 1
